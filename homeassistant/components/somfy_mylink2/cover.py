@@ -4,15 +4,16 @@ import logging
 from homeassistant.components.cover import ENTITY_ID_FORMAT, CoverEntity
 from homeassistant.util import slugify
 
-from . import CONF_DEFAULT_REVERSE, DATA_SOMFY_MYLINK
+from .const import (  # pylint:disable=unused-import
+    CONF_DEFAULT_REVERSE,
+    DATA_SOMFY_MYLINK,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_entry(hass, entry, async_add_entities):
     """Discover and configure Somfy covers."""
-    if discovery_info is None:
-        return
     somfy_mylink = hass.data[DATA_SOMFY_MYLINK]
     cover_list = []
     try:
@@ -23,14 +24,17 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             "please check your settings"
         )
         return
+
+    _LOGGER.info("ENTRY.data %s" % entry.data)
     for cover in mylink_status["result"]:
         entity_id = ENTITY_ID_FORMAT.format(slugify(cover["name"]))
-        entity_config = discovery_info.get(entity_id, {})
-        default_reverse = discovery_info[CONF_DEFAULT_REVERSE]
+        # entity_config = discovery_info.get(entity_id, {})
+        # default_reverse = discovery_info[CONF_DEFAULT_REVERSE]
         cover_config = {}
         cover_config["target_id"] = cover["targetID"]
         cover_config["name"] = cover["name"]
-        cover_config["reverse"] = entity_config.get("reverse", default_reverse)
+        # cover_config["reverse"] = entity_config.get("reverse", default_reverse)
+        cover_config["reverse"] = False
         cover_list.append(SomfyShade(somfy_mylink, **cover_config))
         _LOGGER.info(
             "Adding Somfy Cover: %s with targetID %s",

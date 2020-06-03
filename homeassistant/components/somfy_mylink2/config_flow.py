@@ -10,6 +10,7 @@ from homeassistant.const import CONF_HOST, CONF_PORT
 from .const import (  # pylint:disable=unused-import
     CONF_DEFAULT_REVERSE,
     CONF_SYSTEM_ID,
+    DATA_SOMFY_MYLINK,
     DEFAULT_PORT,
     DOMAIN,
 )
@@ -44,6 +45,8 @@ async def validate_input(hass: core.HomeAssistant, data):
             raise InvalidAuth
     except TimeoutError:
         raise CannotConnect
+
+    hass.data[DATA_SOMFY_MYLINK] = somfy_mylink
 
     # Return info that you want to store in the config entry.
     return {"title": system_id}
