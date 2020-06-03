@@ -1,6 +1,8 @@
 """Component for the Somfy MyLink device supporting the Synergy API."""
 import asyncio
+import logging
 
+from somfy_mylink_synergy import SomfyMyLinkSynergy
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
@@ -8,7 +10,15 @@ from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
-from .const import CONF_DEFAULT_REVERSE, CONF_SYSTEM_ID, DEFAULT_PORT, DOMAIN
+from .const import (
+    CONF_DEFAULT_REVERSE,
+    CONF_SYSTEM_ID,
+    DATA_SOMFY_MYLINK,
+    DEFAULT_PORT,
+    DOMAIN,
+)
+
+_LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -39,6 +49,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up somfy_mylink2 from a config entry."""
     # TODO Store an API object for your platforms to access
     # hass.data[DOMAIN][entry.entry_id] = MyApi(...)
+
+    system_id = entry.data[CONF_SYSTEM_ID]
+    host = entry.data[CONF_HOST]
+    port = entry.data[CONF_PORT]
+
+    hass.data[DATA_SOMFY_MYLINK] = SomfyMyLinkSynergy(system_id, host, port)
 
     for component in PLATFORMS:
         hass.async_create_task(
