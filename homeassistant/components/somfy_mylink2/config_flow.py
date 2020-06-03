@@ -22,7 +22,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_HOST): str,
         vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
         vol.Required(CONF_SYSTEM_ID): str,
-        vol.Required(CONF_DEFAULT_REVERSE): bool,
+        CONF_DEFAULT_REVERSE: bool,
     }
 )
 
