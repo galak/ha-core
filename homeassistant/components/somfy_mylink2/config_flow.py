@@ -59,15 +59,19 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_import(self, user_input=None):
         """Handle configuration by yaml file."""
         self._is_import = True
+        _LOGGER.info("MYLINK IMPORT %s" % user_input)
         return await self.async_step_user(user_input)
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         errors = {}
         if user_input is not None:
+            _LOGGER.info("MYLINK USER INPUT: %s" % user_input)
             try:
                 info = await validate_input(self.hass, user_input)
 
+                await self.async_set_unique_id(user_input[CONF_SYSTEM_ID])
+                self._abort_if_unique_id_configured()
                 return self.async_create_entry(title=info["title"], data=user_input)
             except CannotConnect:
                 errors["base"] = "cannot_connect"

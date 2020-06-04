@@ -5,7 +5,7 @@ import logging
 from somfy_mylink_synergy import SomfyMyLinkSynergy
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
 from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
@@ -59,13 +59,22 @@ PLATFORMS = ["cover"]
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the somfy_mylink2 component."""
+    _LOGGER.info("MYLINK async_setup")
+    if DOMAIN in config:
+        hass.async_create_task(
+            hass.config_entries.flow.async_init(
+                DOMAIN, context={"source": SOURCE_IMPORT}, data=config[DOMAIN]
+            )
+        )
+        _LOGGER.info("MYLINK async_setup: %s" % config[DOMAIN])
+
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up somfy_mylink2 from a config entry."""
-    # TODO Store an API object for your platforms to access
-    # hass.data[DOMAIN][entry.entry_id] = MyApi(...)
+
+    _LOGGER.info("MYLINK async_setup_entry")
 
     system_id = entry.data[CONF_SYSTEM_ID]
     host = entry.data[CONF_HOST]
