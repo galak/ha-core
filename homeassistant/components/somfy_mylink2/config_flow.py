@@ -22,7 +22,7 @@ DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_HOST): str,
         vol.Required(CONF_PORT, default=DEFAULT_PORT): int,
         vol.Required(CONF_SYSTEM_ID): str,
-        CONF_DEFAULT_REVERSE: bool,
+        vol.Optional(CONF_DEFAULT_REVERSE): bool,
     }
 )
 
@@ -54,8 +54,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for somfy_mylink2."""
 
     VERSION = 1
-    # TODO pick one of the available connection classes in homeassistant/config_entries.py
-    CONNECTION_CLASS = config_entries.CONN_CLASS_UNKNOWN
+    CONNECTION_CLASS = config_entries.CONN_CLASS_ASSUMED
+
+    async def async_step_import(self, user_input=None):
+        """Handle configuration by yaml file."""
+        self._is_import = True
+        return await self.async_step_user(user_input)
 
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""

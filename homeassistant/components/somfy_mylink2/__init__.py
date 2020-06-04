@@ -12,6 +12,8 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import (
     CONF_DEFAULT_REVERSE,
+    CONF_ENTITY_CONFIG,
+    CONF_REVERSE,
     CONF_SYSTEM_ID,
     DATA_SOMFY_MYLINK,
     DEFAULT_PORT,
@@ -19,6 +21,20 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def validate_entity_config(values):
+    """Validate config entry for CONF_ENTITY."""
+    entity_config_schema = vol.Schema({vol.Optional(CONF_REVERSE): cv.boolean})
+    if not isinstance(values, dict):
+        raise vol.Invalid("expected a dictionary")
+    entities = {}
+    for entity_id, config in values.items():
+        entity = cv.entity_id(entity_id)
+        config = entity_config_schema(config)
+        entities[entity] = config
+    return entities
+
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -28,6 +44,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_HOST): cv.string,
                 vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
                 vol.Optional(CONF_DEFAULT_REVERSE, default=False): cv.boolean,
+                vol.Optional(CONF_ENTITY_CONFIG, default={}): validate_entity_config,
             }
         )
     },
